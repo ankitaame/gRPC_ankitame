@@ -1,0 +1,30 @@
+syntax = "proto3";
+package inventory;
+import "inventoryModel.proto";
+
+service InventoryService {
+
+    rpc CreateBook (CreateBookRequest) returns (CreateBookReply) {}
+    rpc GetBook (GetBookRequest) returns (GetBookReply) {}
+}
+
+message CreateBookRequest {
+    optional Book bookedCreated = 1; 
+}
+
+message CreateBookReply {
+    int32 statusCode = 1;
+    ResponseStatus response = 2;
+}
+
+message GetBookRequest {
+    string isbn = 1;
+}
+
+message GetBookReply {
+    int32 statusCode = 1;
+    string reponseMessage = 2;
+    Book book = 3;
+    ResponseStatus response = 4;
+}
+

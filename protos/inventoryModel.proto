@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package inventorySystem;
+
+
+enum Genre {
+    ROMANCE = 0; 
+    NON_FICTION = 1;
+    THRILLER = 2;
+  }
+
+
+  enum IssueStatus {
+    AVAILABLE = 0; //default
+    TAKEN = 1;
+  }
+message Book {
+    optional string isbn = 1;
+    optional string title = 2;
+    optional string author = 3;
+    optional Genre genre = 4 ;
+    optional int32 publishing_year = 5;
+  }
+
+
+message InventoryItem {
+    optional int32 inventory_number = 1;
+    oneof item {
+          Book book = 2;
+    }
+    optional IssueStatus status = 3;
+  }
+
+
+  message ResponseStatus {
+    optional int32 code = 1;
+    optional string message = 2;
+  } 
