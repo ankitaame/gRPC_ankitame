@@ -1,12 +1,6 @@
 syntax = "proto3";
-package inventory;
 import "inventoryModel.proto";
-
-service InventoryService {
-
-    rpc CreateBook (CreateBookRequest) returns (CreateBookReply) {}
-    rpc GetBook (GetBookRequest) returns (GetBookReply) {}
-}
+package inventorySystem;
 
 message CreateBookRequest {
     optional Book bookedCreated = 1; 
@@ -28,3 +22,8 @@ message GetBookReply {
     ResponseStatus response = 4;
 }
 
+service InventoryService {
+
+    rpc CreateBook (CreateBookRequest) returns (CreateBookReply) {}
+    rpc GetBook (GetBookRequest) returns (GetBookReply) {}
+}

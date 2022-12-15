@@ -2,13 +2,11 @@ syntax = "proto3";
 
 package inventorySystem;
 
-
 enum Genre {
     ROMANCE = 0; 
     NON_FICTION = 1;
     THRILLER = 2;
   }
-
 
   enum IssueStatus {
     AVAILABLE = 0; //default

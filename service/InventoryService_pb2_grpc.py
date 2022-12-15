@@ -15,12 +15,12 @@ class InventoryServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateBook = channel.unary_unary(
-                '/inventory.InventoryService/CreateBook',
+                '/inventorySystem.InventoryService/CreateBook',
                 request_serializer=InventoryService__pb2.CreateBookRequest.SerializeToString,
                 response_deserializer=InventoryService__pb2.CreateBookReply.FromString,
                 )
         self.GetBook = channel.unary_unary(
-                '/inventory.InventoryService/GetBook',
+                '/inventorySystem.InventoryService/GetBook',
                 request_serializer=InventoryService__pb2.GetBookRequest.SerializeToString,
                 response_deserializer=InventoryService__pb2.GetBookReply.FromString,
                 )
@@ -56,7 +56,7 @@ def add_InventoryServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'inventory.InventoryService', rpc_method_handlers)
+            'inventorySystem.InventoryService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -75,7 +75,7 @@ class InventoryService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/inventory.InventoryService/CreateBook',
+        return grpc.experimental.unary_unary(request, target, '/inventorySystem.InventoryService/CreateBook',
             InventoryService__pb2.CreateBookRequest.SerializeToString,
             InventoryService__pb2.CreateBookReply.FromString,
             options, channel_credentials,
@@ -92,7 +92,7 @@ class InventoryService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/inventory.InventoryService/GetBook',
+        return grpc.experimental.unary_unary(request, target, '/inventorySystem.InventoryService/GetBook',
             InventoryService__pb2.GetBookRequest.SerializeToString,
             InventoryService__pb2.GetBookReply.FromString,
             options, channel_credentials,
