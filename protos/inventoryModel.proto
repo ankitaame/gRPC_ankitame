@@ -2,16 +2,20 @@ syntax = "proto3";
 
 package inventorySystem;
 
+//enum for various book genres
 enum Genre {
     ROMANCE = 0; 
     NON_FICTION = 1;
     THRILLER = 2;
   }
 
+  //enum for issue status of book
   enum IssueStatus {
-    AVAILABLE = 0; //default
+    AVAILABLE = 0;
     TAKEN = 1;
   }
+
+
 message Book {
     optional string isbn = 1;
     optional string title = 2;
@@ -20,7 +24,7 @@ message Book {
     optional int32 publishing_year = 5;
   }
 
-
+//
 message InventoryItem {
     optional int32 inventory_number = 1;
     oneof item {
@@ -28,8 +32,7 @@ message InventoryItem {
     }
     optional IssueStatus status = 3;
   }
-
-
+//Response Status containing the code and message
   message ResponseStatus {
     optional int32 code = 1;
     optional string message = 2;

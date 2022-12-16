@@ -1,5 +1,5 @@
 """
-Module to unit test the get_book_titles method using mocks
+unit tests get_book_titles
 """
 import unittest
 from unittest import mock
@@ -8,50 +8,54 @@ from client.get_book_titles import get_book_titles
 from client.inventory_client import InventoryServiceClient
 from service.inventoryModel_pb2 import Book
 
-class GetBookTitleUsingMockTestCase(unittest.TestCase):
- 
+class GetBookTitleMockTest(unittest.TestCase):
+    """
+    tests of get_book_tiles function using mock client
+    """
+
     def setUp(self):
-    
+        """
+         set up common fixtures
+        """
         self.isbns = ['book1', 'book2']
         self.books = [Book(
             isbn='book1',
-            title='Mock Tripwire',
-            author='Lee Child',
+            title='Last Tuesday',
+            author='Nora Mathur',
             genre='ROMANCE',
-            publishing_year=1987
+            publishing_year=1990
         ), Book(
-            isbn='book3',
-            title='Mock Egyptian Civilization',
-            author='Mike Henry',
+            isbn='book2',
+            title='Alex Rider',
+            author='Anthony Horowitz',
             genre='ROMANCE',
-            publishing_year=1960
+            publishing_year=2022
         )]
-        self.titles = ['Mock Tripwire', 'Mock Egyptian Civilization']
+        self.titles = ['Last Tuesday', 'Alex Rider']
 
     @mock.patch.object(InventoryServiceClient, 'get_book_details')
-    def test_get_book_title_no_error(self, mock_grpc_get_book_details):
-        
-        mock_grpc_get_book_details.side_effect = self.books
+    def test_get_book_success(self, mock_get_book_details):
+        """
+          Return the expected book title with no errors
+        """
+        #set mocks
+        mock_get_book_details.side_effect = self.books
+        #create client
+        client = InventoryServiceClient("test1", "test2")
 
-        # creating the client with mocked method
-        inventory_client = InventoryServiceClient("test", "test")
-
-        # calling the method to test
-        actual_titles = get_book_titles(inventory_client, self.isbns)
-
-        # performing the verification
-        mock_grpc_get_book_details.call_count = len(self.isbns)
-        # specifying expected calls for the method
+        #test method
+        actual_titles = get_book_titles(client, self.isbns)
+        mock_get_book_details.call_count = len(self.isbns)
         expected_calls = [mock.call(self.isbns[0]), mock.call(self.isbns[1])]
-        # verifying the calls are made as per specific order
-        mock_grpc_get_book_details.assert_has_calls(expected_calls, any_order=False)
-
-        # verifying the output
-        self.assertEqual(self.titles, actual_titles, "The titles are not as expected.")
+        mock_get_book_details.assert_has_calls(expected_calls, any_order=False)
+        #assert the output
+        self.assertEqual(self.titles, actual_titles)
 
     @mock.patch.object(InventoryServiceClient, 'get_book_details')
-    def test_get_book_title_some_book_not_found(self, mock_grpc_get_book_details):
-
+    def test_get_book_title_some_book_not_found(self, get_book_details):
+        """
+                    Should return the book titles which are present and skip the absent ones
+         """
         self.isbns = ['book1', 'book2']
 
         def side_effect(isbn: str):
@@ -61,38 +65,44 @@ class GetBookTitleUsingMockTestCase(unittest.TestCase):
                 return self.books[1]
 
 
-        mock_grpc_get_book_details.side_effect = side_effect
+        get_book_details.side_effect = side_effect
         inventory_client = InventoryServiceClient("test","test")
 
-        actual_titles = get_book_titles(inventory_client, self.isbns)
+        titles = get_book_titles(inventory_client, self.isbns)
 
-        mock_grpc_get_book_details.call_count = len(self.isbns)
+        expected = [mock.call(self.isbns[0]), mock.call(self.isbns[1])]
 
-        expected_calls = [mock.call(self.isbns[0]), mock.call(self.isbns[1])]
+        get_book_details.assert_has_calls(expected, any_order=True)
 
-        mock_grpc_get_book_details.assert_has_calls(expected_calls, any_order=True)
+        #verify output
+        self.assertEqual(self.titles, titles)
 
-        self.assertEqual(self.titles, actual_titles, "The titles are not as expected.")
-
-class GetBookTitleUsingLiveTestCase(unittest.TestCase):
-
-
+class GetBookTitleLiveTest(unittest.TestCase):
+    """
+        Tests for get_book_title using live client
+    """
     def setUp(self):
-
+        """
+                common fixtures
+            """
         self.isbns = ['book1', 'book2']
         self.titles = ['The Notebook', 'Last Wednesday']
         self.inventory_client = InventoryServiceClient("localhost", "50051")
 
-    def test_get_book_title_no_error(self):
-
+    def test_get_book_title_success(self):
+        """
+            Test success
+           """
         actual_titles = get_book_titles(self.inventory_client, self.isbns)
 
-        self.assertEqual(self.titles, actual_titles, "The titles are not as expected.")
+        self.assertEqual(self.titles, actual_titles)
 
     def test_get_book_title_some_book_not_found(self):
-
+        """
+                 Test  book not found
+                """
         self.isbns = ['book1', 'book2']
         actual_titles = get_book_titles(self.inventory_client, self.isbns)
-        self.assertEqual(self.titles, actual_titles, "The titles are not as expected.")
+        self.assertEqual(self.titles, actual_titles)
 
 

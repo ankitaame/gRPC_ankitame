@@ -20,13 +20,18 @@ class InventoryServiceClient:
         print("Client initialization completed!!!")
 
     def get_book_details(self, isbn):
-            try:
-                print("Getting data from server for" + isbn)
-                bookReq = GetBookRequest(isbn=isbn)
-                bookResp = self.stub.GetBook(bookReq)
-            except grpc.RpcError as err:
-                print("gRPC ERROR: [" + err.code().name + "]: Couldn't fetch data for ISBN: " + isbn + " from gRPC Server..")
-            else:
-                print("Fetched data for ISBN: " + isbn + " from gRPC Server..")
-                print(bookResp.book)
-                return bookResp.book
+        """
+        Method to get details of the book with given isbn
+        :param isbn: string.
+        :return: Book object defined in the protocol buffers
+        """
+        try:
+            print("Getting data from server for" + isbn)
+            bookReq = GetBookRequest(isbn=isbn)
+            get_book_resp = self.stub.GetBook(bookReq)
+        except grpc.RpcError as err:
+            print("gRPC ERROR: [" + err.code().name + "]: Not Possible to fetch data for ISBN: " + isbn)
+        else:
+            print("Fetched data " + isbn)
+            print(get_book_resp.book)
+            return get_book_resp.book

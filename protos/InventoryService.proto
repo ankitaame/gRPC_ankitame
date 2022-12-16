@@ -2,26 +2,27 @@ syntax = "proto3";
 import "inventoryModel.proto";
 package inventorySystem;
 
+//Request to Create a book
 message CreateBookRequest {
     optional Book bookedCreated = 1; 
 }
-
+//Response when grpc is called
 message CreateBookReply {
     int32 statusCode = 1;
     ResponseStatus response = 2;
 }
-
+//Request to Get a book from db
 message GetBookRequest {
     string isbn = 1;
 }
-
+//Response when grpc is called
 message GetBookReply {
     int32 statusCode = 1;
     string reponseMessage = 2;
     Book book = 3;
     ResponseStatus response = 4;
 }
-
+//Service to define rpcs
 service InventoryService {
 
     rpc CreateBook (CreateBookRequest) returns (CreateBookReply) {}

@@ -28,44 +28,52 @@ db = {
 
 
 class InventoryServiceServicer (inventoryService_pb2_grpc.InventoryServiceServicer):
-
+    """
+               RPC Method to create a book in data base after performing validation
+               """
     def CreateBook(self, request, context):
 
         isbn = request.bookedCreated.isbn
         title = request.bookedCreated.title
         author = request.bookedCreated.author
         genre = request.bookedCreated.genre
-        publishing_year = request.bookedCreated.publishing_year 
-        print(isbn,title, author, genre,publishing_year)
+        publishing_year = request.bookedCreated.publishing_year
+
+        # isbn is empty or null
         if isbn == "":
             responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Please enter valid ISBN")
             return inventoryService_pb2.CreateBookReply(statusCode=grpc.StatusCode.INVALID_ARGUMENT.value[0], response=responseStatus)
 
+        # isbn is present, will not add duplicate
         if (isbn in db.keys()):
-            responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.ALREADY_EXISTS.value[0], message="Duplicate ISBN exists")
+            responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.ALREADY_EXISTS.value[0], message="Duplicate ISBN exists! ")
             return inventoryService_pb2.CreateBookReply(statusCode=grpc.StatusCode.ALREADY_EXISTS.value[0], response=responseStatus)
-    
+
+    #primary fields are empty .
         if title=="" or author=="":
             responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Title or Author missing!")
             return inventoryService_pb2.CreateBookReply(statusCode=grpc.StatusCode.INVALID_ARGUMENT.value[0], response=responseStatus)
         
-
+        # isbn is suuccessfully added and created
         bookToAdd = inventoryModel_pb2.Book(isbn = isbn, title=title, author=author, genre=genre, publishing_year=publishing_year)
         print(bookToAdd)
         db[isbn] = bookToAdd
 
+#create suuccess 
         responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.OK.value[0], message="Book successfully created!")
         return inventoryService_pb2.CreateBookReply(statusCode= grpc.StatusCode.OK.value[0], response=responseStatus)
 
-
+    """
+           RPC Method to Get a  book from the inventory
+           """
     def GetBook(self, request, context):
 
         isbn = request.isbn
-       
+        #isbn is empty or null
         if isbn == "":
            responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Please enter valid ISBN")
            return inventoryService_pb2.GetBookReply(statusCode=grpc.StatusCode.INVALID_ARGUMENT.value[0], reponseMessage="Please enter valid ISBN",book={}, response=responseStatus)
-
+        # isbn is does not exist in db
         if (isbn not in db.keys()):
            
            responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Oops!! Book Not Found!!")
@@ -73,7 +81,7 @@ class InventoryServiceServicer (inventoryService_pb2_grpc.InventoryServiceServic
 
     
         requestedBook = db[isbn]
-
+        # book is available, then return details
         responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Found the book")
         return inventoryService_pb2.GetBookReply(statusCode=grpc.StatusCode.OK.value[0], reponseMessage="Book found!",book=requestedBook, response=responseStatus)
 
@@ -85,13 +93,11 @@ def serve():
     inventoryService_pb2_grpc.add_InventoryServiceServicer_to_server(InventoryServiceServicer(), server)
     server.add_insecure_port('[::]:' + port)
 
-    # start the server 
+    # start the server
     server.start()
     print("Server started, listening on " + port)
 
-    # wait for termination
     server.wait_for_termination()
-
 
 if __name__ == "__main__":
     # call serve method as soon as program runs
