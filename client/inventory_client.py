@@ -8,6 +8,7 @@ sys.path.append("../service")
 from service.InventoryService_pb2_grpc import InventoryServiceStub
 from service.InventoryService_pb2 import GetBookRequest
 
+
 # pylint: disable=no-member
 
 class InventoryServiceClient:
@@ -27,8 +28,8 @@ class InventoryServiceClient:
         """
         try:
             print("Getting data from server for" + isbn)
-            bookReq = GetBookRequest(isbn=isbn)
-            get_book_resp = self.stub.GetBook(bookReq)
+            book_req = GetBookRequest(isbn=isbn)
+            get_book_resp = self.stub.GetBook(book_req)
         except grpc.RpcError as err:
             print("gRPC ERROR: [" + err.code().name + "]: Not Possible to fetch data for ISBN: " + isbn)
         else:

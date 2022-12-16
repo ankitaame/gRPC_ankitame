@@ -8,6 +8,7 @@ from client.get_book_titles import get_book_titles
 from client.inventory_client import InventoryServiceClient
 from service.inventoryModel_pb2 import Book
 
+
 class GetBookTitleMockTest(unittest.TestCase):
     """
     tests of get_book_tiles function using mock client
@@ -38,23 +39,23 @@ class GetBookTitleMockTest(unittest.TestCase):
         """
           Return the expected book title with no errors
         """
-        #set mocks
+        # set mocks
         mock_get_book_details.side_effect = self.books
-        #create client
+        # create client
         client = InventoryServiceClient("test1", "test2")
 
-        #test method
+        # test method
         actual_titles = get_book_titles(client, self.isbns)
         mock_get_book_details.call_count = len(self.isbns)
         expected_calls = [mock.call(self.isbns[0]), mock.call(self.isbns[1])]
         mock_get_book_details.assert_has_calls(expected_calls, any_order=False)
-        #assert the output
+        # assert the output
         self.assertEqual(self.titles, actual_titles)
 
     @mock.patch.object(InventoryServiceClient, 'get_book_details')
     def test_get_book_title_some_book_not_found(self, get_book_details):
         """
-                    Should return the book titles which are present and skip the absent ones
+                    Should return the book resultant_titles which are present and skip the absent ones
          """
         self.isbns = ['book1', 'book2']
 
@@ -64,28 +65,29 @@ class GetBookTitleMockTest(unittest.TestCase):
             elif isbn == self.isbns[1]:
                 return self.books[1]
 
-
         get_book_details.side_effect = side_effect
-        inventory_client = InventoryServiceClient("test","test")
+        client = InventoryServiceClient("test", "test")
 
-        titles = get_book_titles(inventory_client, self.isbns)
+        resultant_titles = get_book_titles(client, self.isbns)
 
         expected = [mock.call(self.isbns[0]), mock.call(self.isbns[1])]
 
         get_book_details.assert_has_calls(expected, any_order=True)
 
-        #verify output
-        self.assertEqual(self.titles, titles)
+        # verify output
+        self.assertEqual(self.titles, resultant_titles)
+
 
 class GetBookTitleLiveTest(unittest.TestCase):
     """
         Tests for get_book_title using live client
     """
+
     def setUp(self):
         """
                 common fixtures
             """
-        self.isbns = ['book1', 'book2']
+        self.isbns_identifiers = ['book1', 'book2']
         self.titles = ['The Notebook', 'Last Wednesday']
         self.inventory_client = InventoryServiceClient("localhost", "50051")
 
@@ -93,7 +95,7 @@ class GetBookTitleLiveTest(unittest.TestCase):
         """
             Test success
            """
-        actual_titles = get_book_titles(self.inventory_client, self.isbns)
+        actual_titles = get_book_titles(self.inventory_client, self.isbns_identifiers)
 
         self.assertEqual(self.titles, actual_titles)
 
@@ -101,8 +103,6 @@ class GetBookTitleLiveTest(unittest.TestCase):
         """
                  Test  book not found
                 """
-        self.isbns = ['book1', 'book2']
-        actual_titles = get_book_titles(self.inventory_client, self.isbns)
+        self.isbns_identifiers = ['book1', 'book2']
+        actual_titles = get_book_titles(self.inventory_client, self.isbns_identifiers)
         self.assertEqual(self.titles, actual_titles)
-
-

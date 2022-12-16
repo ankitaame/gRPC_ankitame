@@ -24,7 +24,7 @@ message Book {
     optional int32 publishing_year = 5;
   }
 
-//
+//Inventory Item showing oneof field
 message InventoryItem {
     optional int32 inventory_number = 1;
     oneof item {
