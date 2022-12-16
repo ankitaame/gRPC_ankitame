@@ -27,7 +27,6 @@ db = {
 }
 
 
-
 class InventoryServiceServicer (inventoryService_pb2_grpc.InventoryServiceServicer):
 
     def CreateBook(self, request, context):
@@ -50,7 +49,7 @@ class InventoryServiceServicer (inventoryService_pb2_grpc.InventoryServiceServic
             responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Title or Author missing!")
             return inventoryService_pb2.CreateBookReply(statusCode=grpc.StatusCode.INVALID_ARGUMENT.value[0], response=responseStatus)
         
-        """All validations are successfull, go ahead to create book and add it to db"""
+
         bookToAdd = inventoryModel_pb2.Book(isbn = isbn, title=title, author=author, genre=genre, publishing_year=publishing_year)
         print(bookToAdd)
         db[isbn] = bookToAdd
@@ -75,21 +74,18 @@ class InventoryServiceServicer (inventoryService_pb2_grpc.InventoryServiceServic
     
         requestedBook = db[isbn]
 
-        # print(requestedBook["genre"])
-
         responseStatus = inventoryModel_pb2.ResponseStatus(code = grpc.StatusCode.INVALID_ARGUMENT.value[0], message="Found the book")
         return inventoryService_pb2.GetBookReply(statusCode=grpc.StatusCode.OK.value[0], reponseMessage="Book found!",book=requestedBook, response=responseStatus)
 
 
 def serve():
-    # define port for grpc server to listen with 10 threads
     port = '50051'
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
     inventoryService_pb2_grpc.add_InventoryServiceServicer_to_server(InventoryServiceServicer(), server)
     server.add_insecure_port('[::]:' + port)
 
-    # start the server and print on console
+    # start the server 
     server.start()
     print("Server started, listening on " + port)
 
